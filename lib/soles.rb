@@ -7,5 +7,5 @@ module Soles
   autoload :Generator, "soles/generator"
   autoload :Controller, "soles/controller"
 
-  mattr_accessor :environment, :configuration, :root
+  mattr_accessor :environment, :configuration, :root, :logger
 end

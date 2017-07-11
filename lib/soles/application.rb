@@ -12,6 +12,7 @@ module Soles
       load_environment!
       load_initializers!
       load_commands!
+      Soles.logger = Logger.new(File.join(Soles.root, "log", "soles.#{Soles.environment}.log"))
     end
     
     def root
