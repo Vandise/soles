@@ -1,2 +1,2 @@
 require 'spec_helper'
-require 'soles'
+require_relative '../config/app'

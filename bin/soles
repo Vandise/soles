@@ -4,7 +4,6 @@ require "bundler/setup"
 require "soles"
 require "erb"
 require "thor"
-require "colorized_string"
 require "irb"
 require "active_support/inflector"
 
@@ -16,9 +15,9 @@ module Soles
     
     include Thor::Actions
     desc "new NAME", "Create a new Soles application in the given directory"
-    def new(name)
+    def new(name, root = Dir.pwd)
       banner "Generating app..."
-      self.destination_root = File.expand_path(File.join(Dir.pwd, name))
+      self.destination_root = File.expand_path(File.join(root, name))
 
       directory ".", vars: {
         class_name: name.classify
@@ -27,15 +26,18 @@ module Soles
       chmod "bin/soles", 0755
 
       Dir.chdir(self.destination_root) do
-        puts `bundle`
+        banner "Installing dependencies..."
+        puts `BUNDLE_GEMFILE=Gemfile bundle`
         banner "App generated!"
-        puts `bin/soles help`
+        puts `BUNDLE_GEMFILE=Gemfile bundle exec bin/soles help`
+        banner "Sanity checking install..."
+        puts `BUNDLE_GEMFILE=Gemfile rspec --force-colour`
       end
     end
 
     desc "console ENV", "boot a console with this application environment"
     def console(env = "development")
-      self.class.application? do
+      if self.class.application?(true)
         ENV['SOLES_APP'] = env
         puts format("%s %s", ColorizedString["[#{env}]"].colorize(:green), ColorizedString["Welcome to Soles"].colorize(:yellow))
         require_relative "../config/app.rb"
@@ -44,27 +46,33 @@ module Soles
       end
     end
 
-    def self.application?
-      is_app = File.exists? File.expand_path(File.join(__FILE__, "..", "..", "config", "app.rb"))
-      if block_given?
-        if is_app
-          yield
-        else
-          puts "Create a new application with `soles new appname`"  
-        end
+    def self.app_root
+      f = File.expand_path(File.join(Dir.pwd, "config", "app.rb"))
+      return f if File.exists?(f)
+
+      f = File.expand_path(File.join(__FILE__, "..", "..", "config", "app.rb"))
+      return f if File.exists?(f)
+
+      return nil
+    end
+
+    def self.application?(alert = false)
+      if app_root
+        true
       else
-        is_app
+        puts "Create a new application with `soles new appname`" if alert
+        false
       end
     end
 
     no_commands do
       def banner(text)
-        puts ColorizedString["\n#{text}"].colorize(:yellow)
-        puts ColorizedString["-" * 80].colorize(:yellow)
+        shell.say "\n#{text}", :yellow
+        shell.say "-" * 80, :yellow
       end
     end
   end
 end
 
-require_relative "../config/app.rb" if Soles::Commands.application?
+require Soles::Commands.app_root if Soles::Commands.application?
 Soles::Commands.start

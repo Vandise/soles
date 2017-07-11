@@ -61,7 +61,6 @@ module Soles
     end    
 
     def setup_autoloader!
-      Soles.configuration.autoload_paths = ["app/controllers", "app/models", "app/lib", "lib"]
       ActiveSupport::Dependencies.hook!
     end
   end
