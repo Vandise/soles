@@ -7,10 +7,11 @@ module Soles
 
     def generate!
       copy ["app", "controllers", "application_controller.rb"]
-      maybe_make "config/initializers"
-      maybe_make "log"
       copy ["config", "app.rb"]
       copy ["..", "bin", "soles"], ["bin", "soles"], raw: true, mode: 0755
+      maybe_make ["app", "models"]
+      maybe_make ["config", "initializers"]
+      maybe_make "log"
 
       %w(development test production).each do |env|
         @environment = env
@@ -20,7 +21,7 @@ module Soles
     end
 
     def maybe_make(dir, silent = false)
-      target = dir[0] == "/" ? dir : File.join(@root, dir)
+      target = dir[0] == "/" ? dir : File.join(@root, *Array(dir))
       if File.exists?(target)
         fail "Exists: #{relative target}/" unless silent
       else

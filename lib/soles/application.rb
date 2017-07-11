@@ -35,7 +35,7 @@ module Soles
     end
 
     def setup_configuration(options)
-      default_config_path = File.join(Soles.root, "config", "config", "**", "*.yml")
+      default_config_path = File.join(Soles.root, "config", "configs", "**", "*.yml")
       config_path = options[:config_path] || default_config_path
       config_files = options[:config_files] || Dir.glob(config_path)
       @configuration ||= Configuration.new(Soles.environment, config_files)
@@ -63,8 +63,6 @@ module Soles
         File.join(Soles.root, "app", "controllers"),
         File.join(Soles.root, "app", "models"),
       ]
-      ActiveSupport::Dependencies.logger = Logger.new($stderr)
-      ActiveSupport::Dependencies.log_activity = true
       ActiveSupport::Dependencies.hook!
     end
   end
