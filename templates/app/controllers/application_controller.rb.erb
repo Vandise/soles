@@ -1,0 +1,8 @@
+class ApplicationController < Soles::Controller
+  describes :app, "Core application commands"
+
+  desc "your_command PARAM", "Implement any custom commands here"
+  def your_command(param = nil)
+    puts "Hello from Soles!"
+  end
+end

@@ -3,6 +3,8 @@ require "soles/version"
 module Soles
   autoload :Application, "soles/application"
   autoload :Configuration, "soles/configuration"
+  autoload :Generator, "soles/generator"
+  autoload :Controller, "soles/controller"
 
   def self.mattr_accessor(*names)
     names.each do |name|

@@ -1,0 +1,6 @@
+require 'soles'
+require 'irb'
+
+class <%=@class_name%>
+  Application = Soles::Application.new(File.expand_path(File.join(__FILE__, "..", "..")), environment_key: "SOLES_ENV")
+end

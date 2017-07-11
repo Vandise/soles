@@ -1,0 +1,45 @@
+#!/usr/bin/env ruby
+
+require "bundler/setup"
+require "soles"
+require "erb"
+require "thor"
+require "colorized_string"
+require "irb"
+
+module Soles
+  class Commands < Thor
+    desc "new NAME", "Create a new Soles application in the given directory"
+    def new(name)
+      generator = Soles::Generator.new name
+      generator.generate!
+    end
+
+    desc "console ENV", "boot a console with this application environment"
+    def console(env = "development")
+      self.class.application? do
+        ENV['SOLES_APP'] = env
+        puts format("%s %s", ColorizedString["[#{env}]"].colorize(:green), ColorizedString["Welcome to Soles"].colorize(:yellow))
+        require_relative "../config/app.rb"
+        ARGV.clear
+        IRB.start File.expand_path(File.join(__FILE__, "..", ".."))
+      end
+    end
+
+    def self.application?
+      is_app = File.exists? File.expand_path(File.join(__FILE__, "..", "..", "config", "app.rb"))
+      if block_given?
+        if is_app
+          yield
+        else
+          puts "Create a new application with `soles new appname`"  
+        end
+      else
+        is_app
+      end
+    end
+  end
+end
+
+require_relative "../config/app.rb" if Soles::Commands.application?
+Soles::Commands.start

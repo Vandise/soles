@@ -1,20 +1,40 @@
+require 'active_support/dependencies'
+require 'active_support/descendants_tracker'
+require 'logger'
+
 module Soles
   class Application
     def initialize(base_directory, options = {})
       Soles.root = base_directory
       parse_environment!(options)
-      Soles.configuration = configuration(options)
+      Soles.configuration = setup_configuration(options)
+      setup_autoloader!
       load_environment!
       load_initializers!
+      load_commands!
+    end
+    
+    def root
+      Soles.root
     end
 
-    # Parse out command line parameters and Do Something(TM)
-    def run
+    def configuration
+      Soles.configuration
     end
 
     private
 
-    def configuration(options)
+    def load_commands!
+      Dir.glob(File.join(Soles.root, "app", "controllers", "**", "*.rb")).sort.each do |file|
+        require file
+      end
+
+      Soles::Controller.descendants.each do |klass|
+        klass.register_in(::Soles::Commands)
+      end
+    end
+
+    def setup_configuration(options)
       default_config_path = File.join(Soles.root, "config", "config", "**", "*.yml")
       config_path = options[:config_path] || default_config_path
       config_files = options[:config_files] || Dir.glob(config_path)
@@ -37,5 +57,15 @@ module Soles
         File.open(file) {|f| eval f.read, binding, file }      # rubocop:disable Lint/Eval
       end
     end    
+
+    def setup_autoloader!
+      ActiveSupport::Dependencies.autoload_paths = [
+        File.join(Soles.root, "app", "controllers"),
+        File.join(Soles.root, "app", "models"),
+      ]
+      ActiveSupport::Dependencies.logger = Logger.new($stderr)
+      ActiveSupport::Dependencies.log_activity = true
+      ActiveSupport::Dependencies.hook!
+    end
   end
 end
