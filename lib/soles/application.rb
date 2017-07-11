@@ -8,11 +8,12 @@ module Soles
       Soles.root = base_directory
       parse_environment!(options)
       Soles.configuration = setup_configuration(options)
+      Soles.logger = Logger.new(File.join(Soles.root, "log", "soles.#{Soles.environment}.log"))
       setup_autoloader!
       load_environment!
+      yield Soles.configuration if block_given?
       load_initializers!
       load_commands!
-      Soles.logger = Logger.new(File.join(Soles.root, "log", "soles.#{Soles.environment}.log"))
     end
     
     def root
@@ -31,7 +32,7 @@ module Soles
       end
 
       Soles::Controller.descendants.each do |klass|
-        klass.register_in(::Soles::Commands)
+        klass.register_in(::Soles::Commands) if defined?(::Soles::Commands)
       end
     end
 
@@ -60,10 +61,7 @@ module Soles
     end    
 
     def setup_autoloader!
-      ActiveSupport::Dependencies.autoload_paths = [
-        File.join(Soles.root, "app", "controllers"),
-        File.join(Soles.root, "app", "models"),
-      ]
+      Soles.configuration.autoload_paths = ["app/controllers", "app/models", "app/lib", "lib"]
       ActiveSupport::Dependencies.hook!
     end
   end

@@ -6,13 +6,31 @@ require "erb"
 require "thor"
 require "colorized_string"
 require "irb"
+require "active_support/inflector"
 
 module Soles
   class Commands < Thor
+    def self.source_root
+      File.expand_path File.join(__FILE__, "..", "..", "templates")
+    end
+    
+    include Thor::Actions
     desc "new NAME", "Create a new Soles application in the given directory"
     def new(name)
-      generator = Soles::Generator.new name
-      generator.generate!
+      banner "Generating app..."
+      self.destination_root = File.expand_path(File.join(Dir.pwd, name))
+
+      directory ".", vars: {
+        class_name: name.classify
+      }
+      copy_file "../bin/soles", "bin/soles"
+      chmod "bin/soles", 0755
+
+      Dir.chdir(self.destination_root) do
+        puts `bundle`
+        banner "App generated!"
+        puts `bin/soles help`
+      end
     end
 
     desc "console ENV", "boot a console with this application environment"
@@ -36,6 +54,13 @@ module Soles
         end
       else
         is_app
+      end
+    end
+
+    no_commands do
+      def banner(text)
+        puts ColorizedString["\n#{text}"].colorize(:yellow)
+        puts ColorizedString["-" * 80].colorize(:yellow)
       end
     end
   end

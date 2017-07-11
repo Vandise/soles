@@ -1,4 +1,5 @@
 require 'yaml'
+require 'pathname'
 
 module Soles
   class Configuration
@@ -59,6 +60,21 @@ module Soles
         recurse_config config[next_key], keys, default
       else
         default
+      end
+    end
+
+    def autoload_paths
+      ActiveSupport::Dependencies.autoload_paths
+    end
+    
+    def autoload_paths=(paths)
+      ActiveSupport::Dependencies.autoload_paths = paths.map do |p|
+        path = Pathname.new(p)
+        if path.absolute?
+          p
+        else
+          File.join(Soles.root, p)
+        end
       end
     end
 

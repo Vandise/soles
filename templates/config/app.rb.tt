@@ -1,0 +1,12 @@
+require 'soles'
+require 'irb'
+
+module <%=config[:vars][:class_name] %>
+  Application = Soles::Application.new(File.expand_path(File.join(__FILE__, "..", "..")), environment_key: "SOLES_ENV") do |config|
+    config.autoload_paths += %w(
+      app/controllers
+      app/models
+      app/lib
+    )
+  end
+end

@@ -1,6 +1,6 @@
-# This is the <%=@environment %>% configuration file.
+# This is the production configuration file.
 # You can read these values with Soles.configuration.value("key") or Soles.configuration.value("tree_key.sub_key")
-<%=@environment%>:
+production:
   key: value
   tree_key:
     sub_key: value

@@ -1,5 +1,6 @@
+require 'thor'
 module Soles
-  class Controller < Thor
+  class Controller < ::Thor
     extend ActiveSupport::DescendantsTracker
 
     def self.describes(name, desc)
