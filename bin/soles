@@ -2,10 +2,7 @@
 
 require "bundler/setup"
 require "soles"
-require "erb"
 require "thor"
-require "irb"
-require "active_support/inflector"
 
 module Soles
   class Commands < Thor
@@ -16,11 +13,19 @@ module Soles
     include Thor::Actions
     desc "new NAME", "Create a new Soles application in the given directory"
     def new(name, root = Dir.pwd)
+      require "securerandom"
+      require "active_support/inflector"
+
       banner "Generating app..."
       self.destination_root = File.expand_path(File.join(root, name))
 
       directory ".", vars: {
-        class_name: name.classify
+        class_name: name.classify,
+        tokens: {
+          development: SecureRandom.base64(128),
+          test: SecureRandom.base64(128),
+          production: SecureRandom.base64(128),
+        }
       }
       copy_file "../bin/soles", "bin/soles"
       chmod "bin/soles", 0755
@@ -37,12 +42,14 @@ module Soles
 
     desc "console ENV", "boot a console with this application environment"
     def console(env = "development")
+      require "irb"
+      require "irb/completion"
       if self.class.application?(true)
         ENV['SOLES_APP'] = env
-        puts format("%s %s", ColorizedString["[#{env}]"].colorize(:green), ColorizedString["Welcome to Soles"].colorize(:yellow))
+        shell.say "[#{env}] Welcome to Soles", :yellow
         require_relative "../config/app.rb"
         ARGV.clear
-        IRB.start File.expand_path(File.join(__FILE__, "..", ".."))
+        IRB.start
       end
     end
 

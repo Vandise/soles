@@ -1,5 +1,6 @@
 require 'yaml'
 require 'pathname'
+require 'active_support/core_ext/hash/deep_merge'
 
 module Soles
   class Configuration
@@ -9,7 +10,7 @@ module Soles
       @full = {}
 
       files.each do |file, merge_strategy|
-        merge_strategy ||= :merge!
+        merge_strategy ||= :deep_merge!
         if File.exist?(file)
           open(file, "rb") do |fp|
             begin
