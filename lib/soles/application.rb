@@ -15,7 +15,7 @@ module Soles
       load_initializers!
       load_commands!
     end
-    
+
     def root
       Soles.root
     end
@@ -37,12 +37,10 @@ module Soles
     end
 
     def setup_configuration(options)
-      default_config_path = File.join(Soles.root, "config", "configs", "**", "*.yml")
-      config_path = options[:config_path] || default_config_path
-      config_files = options[:config_files] || Dir.glob(config_path)
+      config_files = Array(options[:config_files] || File.join(Soles.root, "config", "config.yml"))
       @configuration ||= Configuration.new(Soles.environment, config_files)
     end
-    
+
     def parse_environment!(options)
       Soles.environment = options[:environment] || ENV[options.fetch(:environment_key, 'SOLES_ENV')] || "development"
     end
@@ -58,7 +56,7 @@ module Soles
       Dir.glob(File.join(Soles.root, "config", "initializers", "**", "*.rb")).sort.each do |file|
         File.open(file) {|f| eval f.read, binding, file }      # rubocop:disable Lint/Eval
       end
-    end    
+    end
 
     def setup_autoloader!
       ActiveSupport::Dependencies.hook!

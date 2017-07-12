@@ -9,7 +9,7 @@ module Soles
     def self.source_root
       File.expand_path File.join(__FILE__, "..", "..", "templates")
     end
-    
+
     include Thor::Actions
     desc "new NAME", "Create a new Soles application in the given directory"
     def new(name, root = Dir.pwd)

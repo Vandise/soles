@@ -1,0 +1,17 @@
+# You can read these values with Soles.configuration.value("key") or Soles.configuration.value("tree_key.sub_key")
+
+common: &COMMON
+  key: value
+  common_key: common-value
+
+development:
+  <<: *COMMON
+  key: dev-value
+
+test:
+  <<: *COMMON
+  key: test-value
+
+production:
+  <<: *COMMON
+  key: production-value

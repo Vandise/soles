@@ -67,7 +67,7 @@ module Soles
     def autoload_paths
       ActiveSupport::Dependencies.autoload_paths
     end
-    
+
     def autoload_paths=(paths)
       ActiveSupport::Dependencies.autoload_paths = paths.map do |p|
         path = Pathname.new(p)

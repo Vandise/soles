@@ -1,6 +1,0 @@
-# This is the test configuration file.
-# You can read these values with Soles.configuration.value("key") or Soles.configuration.value("tree_key.sub_key")
-test:
-  key: value
-  tree_key:
-    sub_key: value
