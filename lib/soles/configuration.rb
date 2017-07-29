@@ -50,6 +50,7 @@ module Soles
     # keys - Array of keys to recurse on
     # default - default value to return if the key doesn't exist
     def recurse_config(config, keys, default = nil)
+      return default  unless config
       next_key = keys.shift
       if keys.empty?
         if config.key? next_key

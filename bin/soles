@@ -82,4 +82,8 @@ module Soles
 end
 
 require Soles::Commands.app_root if Soles::Commands.application?
-Soles::Commands.start
+begin
+  Soles::Commands.start
+ensure
+  Soles.shutdown
+end

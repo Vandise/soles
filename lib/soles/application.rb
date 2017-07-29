@@ -46,7 +46,7 @@ module Soles
     end
 
     def load_environment!
-      file = File.join(Soles.root, "config", "environments", Soles.environment, ".rb")
+      file = File.join(Soles.root, "config", "environments", format("%s.rb", Soles.environment))
       if File.exists?(file)
         File.open(file) {|f| eval f.read, binding, file }      # rubocop:disable Lint/Eval
       end
